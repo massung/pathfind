@@ -41,8 +41,11 @@ func Search(g Graph, start, goal Node) ([]Node, bool) {
 			return nodeListOfPath(path), true
 		}
 
-		// remove current from the open set, add to open set
-		openSet = append(openSet[:current], openSet[current + 1:]...)
+		// remove current from the open set
+		openSet[current] = openSet[len(openSet) - 1]
+		openSet = openSet[:len(openSet) - 1]
+
+		// add it to the closed set
 		closedSet = append(closedSet, path)
 
 		// get all the neighboring nodes to this one
