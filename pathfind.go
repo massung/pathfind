@@ -54,12 +54,14 @@ func Search(g Graph, start, goal Node) ([]Node, bool) {
 				continue
 			}
 
-			// calculate the tentative g score for this node
-			score := path.g + e.Cost
-			h := g.H(e.Node, goal)
+			// check to see if the neighbor is in the open set already
 			p := nodeInSet(e.Node, openSet)
 
-			// add the node to the final path
+			// calculate the tentative g score for this node and its h score
+			score := path.g + e.Cost
+			h := g.H(e.Node, goal)
+
+			// add the node to the open set if it isn't in there
 			if p == nil {
 				p = &Path{
 					Node: e.Node,
@@ -71,9 +73,11 @@ func Search(g Graph, start, goal Node) ([]Node, bool) {
 				// add the new path node to the open set
 				openSet = append(openSet, p)
 			} else {
-				// check to see if this path is better
+				// did we get there faster than the old path?
 				if score < p.g {
 					p.Parent = path
+
+					// update with the new g and f scores
 					p.g = score
 					p.f = score + h
 				}
