@@ -5,8 +5,8 @@ type Node interface{}
 
 // a pathfinding graph
 type Graph interface {
-	// return a list of neighboring nodes to a given node
-	Neighbors(Node) []Edge
+	// send the list of neighboring nodes to a channel
+	Neighbors(chan Edge, Node)
 
 	// the heuristic function to approximate the cost between nodes
 	H(Node, Node) float32
@@ -48,8 +48,14 @@ func Search(g Graph, start, goal Node) ([]Node, bool) {
 		// add it to the closed set
 		closedSet = append(closedSet, path)
 
+		// create a channel for all neighbors to be written to
+		neighbors := make(chan Edge)
+
+		// fetch the neighbor nodes
+		go g.Neighbors(neighbors, path.Node)
+
 		// get all the neighboring nodes to this one
-		for _, e := range(g.Neighbors(path.Node)) {
+		for e := range neighbors {
 			if nodeInSet(e.Node, closedSet) != nil {
 				continue
 			}
